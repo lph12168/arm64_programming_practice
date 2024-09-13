@@ -5,7 +5,7 @@
 void uart_send(char c)
 {
 	/* wait for transmit FIFO to have an available slot*/
-	while (readl(U_FR_REG) & (1<<5))
+	while (readl(U_FR_REG) & (1 << 5))
 		;
 
 	writel(c, U_DATA_REG);
@@ -14,10 +14,10 @@ void uart_send(char c)
 char uart_recv(void)
 {
 	/* wait for receive FIFO to have data to read */
-	while (readl(U_FR_REG) & (1<<4))
+	while (readl(U_FR_REG) & (1 << 4))
 		;
 
-	return(readl(U_DATA_REG) & 0xFF);
+	return (readl(U_DATA_REG) & 0xFF);
 }
 
 void uart_send_string(char *str)
@@ -25,7 +25,7 @@ void uart_send_string(char *str)
 	int i;
 
 	for (i = 0; str[i] != '\0'; i++)
-		uart_send((char) str[i]);
+		uart_send((char)str[i]);
 }
 
 void uart_init(void)
@@ -34,26 +34,26 @@ void uart_init(void)
 
 	/* clean gpio14 */
 	selector = readl(GPFSEL1);
-	selector &= ~(7<<12);
+	selector &= ~(7 << 12);
 	/* set alt0 for gpio14 */
-	selector |= 4<<12;
+	selector |= 4 << 12;
 	/* clean gpio15 */
-	selector &= ~(7<<15);
+	selector &= ~(7 << 15);
 	/* set alt0 for gpio15 */
-	selector |= 4<<15;
+	selector |= 4 << 15;
 	writel(selector, GPFSEL1);
 
 #ifdef CONFIG_BOARD_PI3B
 	writel(0, GPPUD);
 	delay(150);
-	writel((1<<14) | (1<<15), GPPUDCLK0);
+	writel((1 << 14) | (1 << 15), GPPUDCLK0);
 	delay(150);
 	writel(0, GPPUDCLK0);
 #else
 	/*set gpio14/15 pull down state*/
 	selector = readl(GPIO_PUP_PDN_CNTRL_REG0);
 	selector |= (0x2 << 30) | (0x2 << 28);
-	writel(selector, GPIO_PUP_PDN_CNTRL_REG0);	
+	writel(selector, GPIO_PUP_PDN_CNTRL_REG0);
 #endif
 
 	/* disable UART until configuration is done */
@@ -75,10 +75,10 @@ void uart_init(void)
 	writel(3, U_FBRD_REG);
 
 	/* enable FIFOs and 8 bits frames */
-	writel((1<<4) | (3<<5), U_LCRH_REG);
+	writel((1 << 4) | (3 << 5), U_LCRH_REG);
 
 	/* mask interupts */
 	writel(0, U_IMSC_REG);
 	/* enable UART, receive and transmit */
-	writel(1 | (1<<8) | (1<<9), U_CR_REG);
+	writel(1 | (1 << 8) | (1 << 9), U_CR_REG);
 }
